@@ -50,7 +50,7 @@
         <Border Grid.Row="1" Background="#F0F0F0" Padding="10" BorderBrush="LightGray" BorderThickness="0,1,0,0">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <TextBlock Text="Sensor IP:" VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="Bold"/>
-                <TextBox x:Name="TxtIp" Text="192.168.5.55" Width="120" VerticalContentAlignment="Center" Padding="2"/>
+                <TextBox x:Name="TxtIp" Text="192.168.5.51" Width="120" VerticalContentAlignment="Center" Padding="2"/>
 
                 <Button x:Name="BtnConnect" Content="Connect" Width="100" Margin="10,0,0,0" Height="25" Click="BtnConnect_Click"/>
                 <Button x:Name="BtnDisconnect" Content="Disconnect" Width="100" Margin="5,0,0,0" Height="25" IsEnabled="False" Click="BtnDisconnect_Click"/>

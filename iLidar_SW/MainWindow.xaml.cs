@@ -152,34 +152,69 @@ namespace iLidar_SW
         // --- 버튼 이벤트 핸들러 ---
         private void BtnConnect_Click(object sender, RoutedEventArgs e)
         {
+            // 사용자가 입력한 IP (예: 192.168.5.55)
             string ip = TxtIp.Text;
-            ushort port = 7257; // 기본 포트
+            ushort port = 7257;
 
-            // 연결 시도 (UI 멈춤 방지를 위해 비동기처럼 보이지만 여기선 간단히 처리)
-            // 실제로는 Task.Run 등을 쓰는 것이 좋음
+            // 1. 연결 시도
+            // (수정된 iTFS.cs가 알아서 내 PC의 랜카드를 찾아 연결해줍니다)
             bool connected = _lidar.Connect(ip, port);
 
             if (connected)
             {
+                // ---------------------------------------------------------
+                // ★ [필수] 3D와 Intensity를 보기 위한 모드 변경 ★
+                // ---------------------------------------------------------
+                var paramsInfo = _lidar.GetParams();
+
+                // 파라미터를 성공적으로 읽어왔다면 설정 변경 시도
+                if (paramsInfo != null)
+                {
+                    // C#에서 읽어온 IP가 정상인지 확인 (0.0.0.0이 아닌지)
+                    // (iTFS.cs 내부에도 안전장치가 있지만, 여기서 한 번 더 확인하면 완벽합니다)
+                    bool isIpValid = paramsInfo.DataSensorIp[0] != 0;
+
+                    if (isIpValid)
+                    {
+                        // 모드 1: Depth + Intensity (3D 뷰어 필수)
+                        paramsInfo.CaptureMode = 1;
+
+                        // (선택 사항) 파이썬 예제에 있던 셔터 속도 등
+                        paramsInfo.CaptureShutter[0] = 400;
+                        paramsInfo.CapturePeriodUs = 100000;
+
+                        // 설정 전송 (iTFS.cs의 안전장치가 지켜줍니다)
+                        _lidar.Unlock();
+                        System.Threading.Thread.Sleep(50); // 센서 처리 대기
+
+                        if (_lidar.SetParams(paramsInfo))
+                        {
+                            System.Diagnostics.Debug.WriteLine("모드 변경 성공!");
+                            _lidar.Store(); // 설정 영구 저장 (선택 사항)
+                        }
+                        else
+                        {
+                            MessageBox.Show("설정 전송이 차단되었습니다. (IP 0.0.0.0 감지됨)");
+                        }
+                    }
+                }
+                // ---------------------------------------------------------
+
+                // 스트리밍 시작
                 _lidar.Start();
                 _isRunning = true;
 
-                TxtStatus.Text = "Connected & Streaming";
+                TxtStatus.Text = $"Connected ({ip})";
                 TxtStatus.Foreground = System.Windows.Media.Brushes.Green;
+
+                // 버튼 상태 변경
                 BtnConnect.IsEnabled = false;
                 BtnDisconnect.IsEnabled = true;
                 TxtIp.IsEnabled = false;
-
-                // 연결 후 파라미터 읽어오기 예시
-                var paramsInfo = _lidar.GetParams();
-                if (paramsInfo != null)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Sensor SN: {paramsInfo.SensorSn}");
-                }
             }
             else
             {
-                MessageBox.Show("센서 연결 실패. IP와 네트워크 설정을 확인하세요.");
+                MessageBox.Show($"연결 실패!\n\n1. IP 주소({ip})가 맞는지 확인하세요.\n2. 방화벽을 잠시 꺼보세요.\n3. 센서 전원을 뺐다 꽂아보세요.");
             }
         }
 
