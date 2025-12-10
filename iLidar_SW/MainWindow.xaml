@@ -1,0 +1,62 @@
+﻿<Window x:Class="iLidar_SW.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:hx="http://helix-toolkit.org/wpf"
+        xmlns:local="clr-namespace:iLidar_SW"
+        mc:Ignorable="d" FontSize="14"
+        Title="iLidar WPF Viewer" Height="600" Width="1000">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <GroupBox Header="Depth Map (2D)" Grid.Row="0" Margin="2">
+                    <Image x:Name="DepthImage" Stretch="Uniform" />
+                </GroupBox>
+
+                <GroupBox Header="Intensity Map (2D)" Grid.Row="1" Margin="2">
+                    <Image x:Name="IntensityImage" Stretch="Uniform" />
+                </GroupBox>
+            </Grid>
+
+            <GroupBox Header="3D Point Cloud" Grid.Column="1" Margin="2">
+                <hx:HelixViewport3D ZoomExtentsWhenLoaded="True" 
+                    ShowCoordinateSystem="True" Background="Black">
+                    <hx:SunLight />
+
+                    <hx:GridLinesVisual3D Width="10" Length="10" MinorDistance="1" MajorDistance="1" Thickness="0.01" Fill="Gray"/>
+
+                    <hx:PointsVisual3D x:Name="PointCloudModel" Size="3" Color="Lime" />
+
+                </hx:HelixViewport3D>
+            </GroupBox>
+        </Grid>
+
+        <Border Grid.Row="1" Background="#F0F0F0" Padding="10" BorderBrush="LightGray" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="Sensor IP:" VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="Bold"/>
+                <TextBox x:Name="TxtIp" Text="192.168.5.55" Width="120" VerticalContentAlignment="Center" Padding="2"/>
+
+                <Button x:Name="BtnConnect" Content="Connect" Width="100" Margin="10,0,0,0" Height="25" Click="BtnConnect_Click"/>
+                <Button x:Name="BtnDisconnect" Content="Disconnect" Width="100" Margin="5,0,0,0" Height="25" IsEnabled="False" Click="BtnDisconnect_Click"/>
+
+                <TextBlock x:Name="TxtStatus" Text="Ready" VerticalAlignment="Center" Margin="20,0,0,0" FontWeight="Bold" Foreground="Gray"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
